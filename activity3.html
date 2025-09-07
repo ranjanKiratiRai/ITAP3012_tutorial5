@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Lab 2: Exercise 3 — Fixed</title>
+
+  <!-- jQuery UI (CDN) -->
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: 24px; line-height: 1.4; }
+    h2 { margin-bottom: 0.25rem; }
+    .row { display: flex; gap: 16px; margin-bottom: 16px; }
+    label { font-weight: 600; margin-right: 8px; }
+    input[type="text"] { padding: 6px 8px; }
+    #year_input { margin-top: 8px; }
+
+    /* Step 2: Selectable list */
+    #selectable { list-style: none; margin: 0; padding: 0; width: 360px; }
+    #selectable li { margin: 4px 0; padding: 8px 10px; font-size: 14px; cursor: pointer; }
+    #selectable .ui-selecting { background: #FECA40; }
+    #selectable .ui-selected { background: #F39814; color: #fff; }
+
+    /* Step 3: Sortable list */
+    #sortable { list-style: none; margin: 0; padding: 0; width: 360px; }
+    #sortable li { position: relative; margin: 4px 0; padding: 8px 10px 8px 28px; font-size: 14px; cursor: move; }
+    #sortable li span { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); }
+
+    /* Step 4: Tooltip color swatch */
+    .color_swatch { height: 50px; width: 50px; border-radius: 6px; border: 1px solid #ccc; }
+    .tip_wrap { display: flex; align-items: center; gap: 10px; }
+    .tip_text { font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h2>jQuery UI — Survey</h2>
+  <h3>General Information</h3>
+
+  <div class="row">
+    <div>
+      <label for="name">Name:</label>
+      <input type="text" id="name" placeholder="Enter your name" />
+    </div>
+    <div>
+      <label for="date">Date:</label>
+      <input type="text" id="date" placeholder="Pick a date" />
+    </div>
+  </div>
+
+  <div id="year_input">
+    <h3>Are you enrolled as an undergraduate or a graduate?</h3>
+    <ol id="selectable" aria-label="Enrollment Type (select one)">
+      <li class="ui-widget-content" title="taking 6.813, doesn't have to do RS assignments">Undergraduate</li>
+      <li class="ui-widget-content" title="taking 6.831, required to do RS assignments">Graduate</li>
+    </ol>
+  </div>
+
+  <div id="color_input" style="margin-top: 20px;">
+    <h3>Rank the colors listed from your most favorite to your least favorite:</h3>
+    <ul id="sortable" aria-label="Rank colors by dragging">
+      <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s" aria-hidden="true"></span>#ff0000</li>
+      <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s" aria-hidden="true"></span>#0000ff</li>
+      <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s" aria-hidden="true"></span>#ff00b3</li>
+      <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s" aria-hidden="true"></span>#ded447</li>
+      <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s" aria-hidden="true"></span>#125e18</li>
+    </ul>
+  </div>
+
+  <script>
+    $(function () {
+      
+      $("#date").datepicker({
+        minDate: new Date(2025, 0, 18   ),
+        maxDate: new Date(2025, 1, 15)
+      });
+
+      /* Step 2: Selectable (single-select behavior like radio buttons) */
+      $("#selectable").selectable({
+        filter: "li",
+        tolerance: "touch",
+        selecting: function (e, ui) {
+          // ensure only one gets selected at a time
+          $(ui.selecting).siblings(".ui-selected").removeClass("ui-selected");
+        }
+      });
+
+      /* Step 3: Sortable ranking */
+      $("#sortable").sortable({
+        axis: "y",
+        containment: "parent"
+      }).disableSelection();
+
+      /* Step 4: Tooltips with color swatch preview + better positioning */
+      $(document).tooltip({
+        items: "[title], li.ui-state-default",
+        track: true,
+        position: { my: "left+15 center", at: "right center" },
+        content: function () {
+          var $el = $(this);
+
+          // Show native title tooltips where present (e.g., Undergraduate/Graduate)
+          if ($el.is("[title]")) {
+            return $el.attr("title");
+          }
+
+          // For color rows, show a swatch
+          if ($el.is("li.ui-state-default")) {
+            var hex = $.trim($el.text());
+            return "<div class='tip_wrap'>" +
+                     "<div class='color_swatch' style='background:" + hex + "'></div>" +
+                     "<div class='tip_text'>" + hex + "</div>" +
+                   "</div>";
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
